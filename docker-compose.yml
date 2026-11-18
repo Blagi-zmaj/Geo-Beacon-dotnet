@@ -1,0 +1,31 @@
+services:
+  db:
+    build: .
+    restart: always
+    shm_size: 128mb
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGUSER:-admin@ecowatch.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGPASSWORD:-postgres}
+    ports:
+      - "8080:80"
+  redis:
+    image: redis:8.10.1-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      # - "redis-data:/usr/local/etc/redis/redis.conf"
+      - "redis-data:/data"
+volumes:
+  db-data:
+  redis-data:
